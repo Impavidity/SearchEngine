@@ -4,9 +4,11 @@ This is the project for information retreival.
 ## Attention
 分工
 A. UI + 说明文档
+
 B. 通配符查询
    Top K查询（7.1 节的内容）
    层次型索引
+
 C. 短语查询
    同义词查询
    拼写矫正
@@ -29,7 +31,6 @@ We will save the following data separately.
 |Info|Format|
 |:--:|:----:|
 |Title|String|
-|ID | int |
 |Passage|String|
 
 
@@ -49,23 +50,17 @@ python InfoExtractor
 ## Boolean search
 search form:
 X AND Y AND NOT Z ... OR P OR Q ...
-first NO
+
+Priority:
+highest NO
 second AND
 third OR
 
 ## Problems
-1. token processing problem: '-'
-current solution: 
-in tokenize.py:
-`primordialTokens = inputStr.replace("-"," ").replace("'"," ").replace("/"," ").split(' ')`
 
-2. numpy version problem
+1. numpy version problem
 
 I must use the pre-installed numpy with version '1.8.0rc1' to make program run correctly.
 reference link: http://comments.gmane.org/gmane.comp.ai.gensim/5643
+Numpy 1.10 would stuck
 
-3. Problematic preprocessing
-
-processed tokens:
-Use regular expression now
-see myTokenize.py

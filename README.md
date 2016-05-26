@@ -38,10 +38,6 @@ cd Data Cleaning
 python InfoExtractor
 ```
 
-## Data structure
-current postingLists form:
-{'term':token, 'docFreq':0, 'docIDs':[]}
-
 ## Boolean search
 search form:
 X AND Y AND NOT Z ... OR P OR Q ...

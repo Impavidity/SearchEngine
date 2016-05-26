@@ -2,6 +2,14 @@
 This is the project for information retreival.
 
 ## Attention
+分工
+A. UI + 说明文档
+B. 通配符查询
+   Top K查询（7.1 节的内容）
+   层次型索引
+C. 短语查询
+   同义词查询
+   拼写矫正
 
 1. To let the title search more accurate, I add the title tokens to the doc tokens twice.
 So, you need to extract new tokens for position index.
@@ -52,12 +60,12 @@ in tokenize.py:
 `primordialTokens = inputStr.replace("-"," ").replace("'"," ").replace("/"," ").split(' ')`
 
 2. numpy version problem
+
 I must use the pre-installed numpy with version '1.8.0rc1' to make program run correctly.
 reference link: http://comments.gmane.org/gmane.comp.ai.gensim/5643
 
 3. Problematic preprocessing
-processed tokens:
-1)..113.................123.00 -> cannot find well
 
-U.S --tokenize--> u.s --stemming--> u.
-	query ok
+processed tokens:
+Use regular expression now
+see myTokenize.py

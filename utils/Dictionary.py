@@ -1,11 +1,10 @@
 import os, sys
-import json
+import pickle, pprint
 
 
 class Entry(object):
-    def __init__(self, id, content):
-        self.id = id
-        self.content = content
+    def __init__(self, file):
+        self.file = file
 
 
 def parse_arguments():
@@ -18,6 +17,9 @@ def get_tokens():
 
 def preprocess(database):
     files = os.listdir(database)
+
+    for file in files:
+        pass
 
 
 def construct_tiered_index():

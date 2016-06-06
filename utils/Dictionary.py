@@ -21,14 +21,16 @@ class Entry(object):
         for line in doc.readlines():
             token_stream += line.replace('&lt', ' ').replace('<', ' ').replace('>', ' ')\
                 .replace('/', ' ').replace('(', ' ').replace(')', ' ').replace(',', ' ')\
-                .replace(':', ' ').replace('\'', ' ').replace('\"', ' ').strip().split()
+                .replace(':', ' ').replace('\'', ' ').replace('\"', ' ').replace('?', ' ')\
+                .strip().split()
 
         for item in token_stream:
-            if item.lower() not in self.tokens:
-                self.tokens.append(item.lower())
-                self.tf[item.lower()] = 1
-            else:
-                self.tf[item.lower()] += 1
+            if item.lower() not in config.STOP_WORDS:
+                if item.lower() not in self.tokens:
+                    self.tokens.append(item.lower())
+                    self.tf[item.lower()] = 1
+                else:
+                    self.tf[item.lower()] += 1
 
 
 class Voc(object):
@@ -65,7 +67,9 @@ def preprocess(database):
     return Voc(entries), entries
 
 
-def construct_tiered_index():
+def construct_tiered_index(voc, entries):
+    assert isinstance(voc, Voc), 'voc is not the instance of Voc.'
+    assert isinstance(entries, list), 'entries is not the instance of list.'
     pass
 
 
@@ -82,6 +86,10 @@ if __name__ == '__main__':
     print 'Parsing vocabulary and entry .............'
     voc, entries = preprocess(database)
     print 'Parsed vocabulary and entry.'
+
+    print 'Constructing tiered index ..............'
+    construct_tiered_index(voc, entries)
+    print 'Constructed tiered index.'
 
 
 

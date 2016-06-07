@@ -58,7 +58,7 @@ def intersect(postingLists):
 	sortedPostingLists = sorted(postingLists, cmp=lambda l1, l2: cmp(l1['docFreq'], l2['docFreq']))
 	resultDocs = sortedPostingLists[0]['docIDs']
 
-	for i in range(1, len(sortedPostingLists)):
+	for i in xrange(1, len(sortedPostingLists)):
 		resultDocs = intersect2Lists(resultDocs, sortedPostingLists[i]['docIDs'])
 	return resultDocs	
 	
@@ -66,7 +66,7 @@ def disjunct(postingLists):
 	"""OR several posting lists, and return expect length --> return a dict"""	
 	resultDocs = postingLists[0]['docIDs']
 
-	for i in range(1, len(postingLists)):
+	for i in xrange(1, len(postingLists)):
 		resultDocs = disjunct2Lists(resultDocs, postingLists[i]['docIDs'])
 		
 	return {
@@ -114,6 +114,10 @@ def parseOR(ORpart):
 def parseAND(ANDpart):
 	ORparts = [x for x in ANDpart.strip(' ').split("OR") if x != '']
 	postingListsToOR = [parseOR(ORpart) for ORpart in ORparts]
+#	print "postingListsToOR"
+#	print postingListsToOR
+#	print "disjunct(postingListsToOR)"
+#	print disjunct(postingListsToOR)
 	return disjunct(postingListsToOR)
 	
 	
@@ -144,6 +148,8 @@ def booleanQuery(query):
 	ANDparts = [x for x in query.strip(' ').split("AND") if x != '']
 	
 	postingListsToAND = [parseAND(ANDpart) for ANDpart in ANDparts]
+#	print "postingListsToAND"
+#	print postingListsToAND
 	resultDocIDs = intersect(postingListsToAND)
 
 	return resultDocIDs

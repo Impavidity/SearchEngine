@@ -7,29 +7,30 @@ import numpy as np
 import myTokenize
 import utils
 
-"""For boolean query"""
-term2tid = {}
-invertedIndex = [] # element form: {'docFreq':0, 'docIDs':[]}
-
-"""For vector space"""
-tf=[]
-	
-docID2Name = {}
 
 def buildIndex():
+	"""For boolean query"""
+	term2tid = {}
+	invertedIndex = [] # element form: {'docFreq':0, 'docIDs':[]}
+
+	"""For vector space"""
+	tf=[]
 	
-	filenames = [x for x in os.listdir('tmp/doc') if x[0] != '.']
+	docID2NameFile = open("docID2Name.json", "r")
+	docID2Name = json.load(docID2NameFile)
+	docID2NameFile.close()
+	
+	total_docs = len(docID2Name)
+		
 	cur_tid = 0
-	cur_docID = 0
-
-	for name in filenames:
-
+	
+	for cur_docID in xrange(total_docs):
+		name = docID2Name[str(cur_docID)]
 		doc = open("tmp/doc/"+name, "r")
-		docID2Name[cur_docID] = name
 		
 		contents = doc.readlines()
 		tokens = myTokenize.tokenize(contents[0][7:-1])
-		tokens.extend(tokens)
+		tokens.extend(tokens) # add the title tokens twice, consider comment it?
 	
 		tokens.extend(myTokenize.tokenize(contents[1][9:-1]))
 		
@@ -53,17 +54,19 @@ def buildIndex():
 			else:
 				tf[tid][-1] = tf[tid][-1] + 1
 		doc.close()
-		cur_docID += 1
 	
+	idf = np.zeros(cur_tid, dtype = np.float64)
+	W = scipy.sparse.lil_matrix((cur_tid, total_docs))
 
-	W = scipy.sparse.lil_matrix((cur_tid, cur_docID))
-
-	for tid in range(cur_tid):
+	for tid in xrange(cur_tid):
 		logtf = 1 + np.log10(np.array(tf[tid]))
 		cosNorm = np.sqrt(np.sum(logtf * logtf))
 
 		logtf = logtf / cosNorm
 		W[tid, invertedIndex[tid]['docIDs']] = logtf
+		
+		idf[tid] = np.log10(total_docs * 1.0 / invertedIndex[tid]['docFreq'])
+		
 	
 	W = scipy.sparse.csr_matrix(W)
 		
@@ -80,9 +83,7 @@ def buildIndex():
 	json.dump(invertedIndex, indexFile)
 	indexFile.close()
 	
-	docID2NameFile = open("docID2Name.json", "w")
-	json.dump(docID2Name, docID2NameFile)
-	docID2NameFile.close()
+	np.save('idf.npy', idf)
 	
 	utils.save_sparse_csr("weightMatrix", W)
 	

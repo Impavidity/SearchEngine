@@ -44,8 +44,8 @@ if __name__ == '__main__':
 			t = time()
 			r = cosineSimilarityQuery.cosSimQuery(query, k)
 			t = time() - t
-		
-		res = [docID2Name[str(docID)] for docID in r[0]]
+			res = [docID2Name[str(docID)] for docID in r[0]]
 		print "resultDocs: ", res
-		print "resultScores: ", r[1]
+		if choice == 1:		
+			print "resultScores: ", r[1]
 		print "search time: ", t

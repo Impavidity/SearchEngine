@@ -2,7 +2,7 @@
 #import time
 import json
 import os
-import tokenize
+import myTokenize
 from porter import PorterStemmer
 import utils
 
@@ -84,8 +84,8 @@ def parseOR(ORpart):
 		ORpart = ORpart[4:]
 		isNOTPart = True
 		
-	ORpartStemed = ORpart.strip("".join(tokenize.strip_punctuations)).lower()
-	if ORpartStemed in tokenize.stop_words:
+	ORpartStemed = ORpart.strip("".join(myTokenize.strip_punctuations)).lower()
+	if ORpartStemed in myTokenize.stop_words:
 		print "Term: " + ORpart + " is a stop word. We assume this word exists in all documents."
 		isSTOPWORD = True
 	else:

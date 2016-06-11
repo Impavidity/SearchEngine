@@ -18,13 +18,13 @@ class query_entry(object):
     def __init__(self, doc_id, tokens, voc):
         self.docID = doc_id
         self.tokens = tokens
-        self.vector = np.array([1, len(voc.tokens)])
+        self.vector = np.zeros([1, len(voc.tokens)])
 
         for token in self.tokens:
             if config.WEIGHT_TYPE == 'wf-idf':
-                self.vector[0, voc.tokens[token]['index']] = (1 + log(self.tokens[token])) * voc.tokens[token]['idf']
+                self.vector[0, voc.dic[token]['index']] = (1 + log(self.tokens[token])) * voc.dic[token]['idf']
             elif config.WEIGHT_TYPE == 'tf-idf':
-                self.vector[0, voc.tokens[token]['index']] = self.tokens[token] * voc.tokens[token]['idf']
+                self.vector[0, voc.dic[token]['index']] = self.tokens[token] * voc.dic[token]['idf']
 
 
 class query_index(object):
@@ -40,15 +40,16 @@ def load_and_calc(pkl_path):
 
     voc = query_voc(info.voc_tokens, info.voc_dic)
     tiered_index = query_index(info.tiered_index)
-    entries = []
-    for doc_id, tokens in enumerate(info.entry_tokens):
-        entries.append(query_entry(doc_id, tokens, voc))
+    entries = {}
+    for item in info.entry_tokens:
+        entries[item] = query_entry(item, info.entry_tokens[item], voc)
 
     return tiered_index, voc, entries
 
 
 def construct_query_vector(tokens, voc):
-    query_vector = np.array([1, len(voc.tokens)])
+    query_vector = np.zeros([1, len(voc.tokens)])
+    print tokens
     for token in tokens:
         if token in voc.tokens:
             query_vector[0, voc.dic[token]['index']] = tokens[token]
@@ -61,19 +62,21 @@ def topK_get_result(index, voc, entries, tokens):
 
     for level in index.tiered_index:
         for token in tokens:
+            if token not in voc.tokens:
+                continue
             docs = level[voc.dic[token]['index']]
             for doc_id in docs:
                 if doc_id not in result:
-                    weight = weights(query_vector, entries[doc_id].weight)
+                    weight = weights(query_vector, entries[doc_id].vector)
                     result.append((doc_id, weight))
 
         if len(result) >= config.PARA_TOP_K:
             return result[:config.PARA_TOP_K]
 
-    if config.DEBUG:
-        print '----------------query result--------------------'
-        print result
-        print '------------------------------------------------'
+    # if config.DEBUG:
+    #     print '----------------query result--------------------'
+    #     print result
+    #     print '------------------------------------------------'
     return result
 
 
@@ -90,8 +93,12 @@ def wildcard_query(index, voc, entries, query, index_type='tiered'):
     tokens = tokenlize(query)
     query_match = [[]]
     for token in tokens:
-        regex = re.compile(token)
-        match_tokens = [string for string in voc.tokens if re.match(regex, string)]
+        match_tokens = []
+        if '*' in token:
+            regex = re.compile(token)
+            match_tokens = [string for string in voc.tokens if re.match(regex, string)]
+        else:
+            match_tokens.append(token)
         tmp = []
         if len(match_tokens) > 0:
             for t1 in match_tokens:
@@ -99,15 +106,26 @@ def wildcard_query(index, voc, entries, query, index_type='tiered'):
                     tmp.append(t2 + [t1])
             query_match = tmp
 
+    tmp = []
+    for item in query_match:
+        q = {}
+        for token in item:
+            if token in q:
+                q[token] += 1
+            else:
+                q[token] = 1
+        tmp.append(q)
+
+    query_match = tmp
     result = []
-    match_id = []
     if index_type == 'tiered':
         for match in query_match:
-            result.append(topK_get_result(index, voc, entries, match))
+            result += topK_get_result(index, voc, entries, match)
 
     result.sort(comp_tuple)
 
     match = []
+    match_id = []
     for doc in result:
         if doc[0] in match_id:
             continue

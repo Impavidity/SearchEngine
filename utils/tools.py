@@ -30,9 +30,9 @@ def tokenlize(string):
     result = {}
     for token in tokens:
         if token in result:
-            result[token] = 1
-        else:
             result[token] += 1
+        else:
+            result[token] = 1
 
     return result
 

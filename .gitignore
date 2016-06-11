@@ -1,7 +1,8 @@
 # Data files
 *.json
 *.npz
-*.html
+#*.html
+*.*~
 /Data Cleaning/tmp/*
 
 # Byte-compiled / optimized / DLL files
@@ -17,7 +18,7 @@ __pycache__/
 env/
 build/
 develop-eggs/
-dist/
+#dist/
 downloads/
 eggs/
 .eggs/

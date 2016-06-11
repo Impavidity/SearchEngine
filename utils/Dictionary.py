@@ -1,31 +1,15 @@
 from config.config import config
-from math import log
 import os, sys, re
-import numpy as np
 import cPickle as pickle
-
-def calculate_weights(voc, entries):
-    vlen = len(voc.tokens)
-
-    for entry in entries:
-        vector = np.zeros([1, vlen])
-        for token in entry.tokens:
-            if config.WEIGHT_TYPE == 'wf-idf':
-                vector[0, voc.token_index[token]] = (1 + log(entry.tf[token])) * voc.idf[token]
-            elif config.WEIGHT_TYPE == 'tf-idf':
-                vector[0, voc.token_index[token]] = entry.tf[token] * voc.idf[token]
-        entry.set_weight(vector)
 
 
 class Entry(object):
-    def __init__(self, doc_path):
+    def __init__(self, doc_id, doc_path):
         assert os.path.exists(doc_path), "File {} doesn't exits.".format(doc_path)
-        self.docID = doc_path
-        self.tokens = []
-        self.tf = {}
-        self.weight = np.array([])
+        self.docID = doc_id
+        self.tokens = {}
 
-        doc = open(self.docID, "r")
+        doc = open(doc_path, "r")
         self.get_tokens(doc)
 
         doc.close()
@@ -38,14 +22,12 @@ class Entry(object):
             strip_token_stream = [x.strip(',.').replace(",", "").lower() for x in pre_token_stream if x != None]
             token_stream += [x.lower() for x in strip_token_stream if x != '' and x not in config.STOP_WORDS]
 
-        print token_stream
         for item in token_stream:
             if item not in config.STOP_WORDS:
                 if item not in self.tokens:
-                    self.tokens.append(item)
-                    self.tf[item] = 1
+                    self.tokens[item] = 1
                 else:
-                    self.tf[item] += 1
+                    self.tokens[item] += 1
 
     def set_weight(self, weight):
         self.weight = weight
@@ -55,10 +37,7 @@ class Voc(object):
     def __init__(self, entries):
         assert isinstance(entries, list), 'The entries is not the instance of list.'
         self.tokens = []
-        self.token_index = {}
-        self.tf = {}
-        self.df = {}
-        self.idf = {}
+        self.dic = {}
         self.doc_numbers = len(entries)
 
         # Calculate tf and df for each token
@@ -67,20 +46,19 @@ class Voc(object):
             for token in entry.tokens:
                 if token not in self.tokens:
                     self.tokens.append(token)
-                    self.tf[token] = entry.tf[token]
-                    self.df[token] = 1
+                    self.dic[token]={
+                        'tf': entry.tokens[token],
+                        'df': 1
+                    }
                 else:
-                    self.tf[token] += entry.tf[token]
-                    self.df[token] += 1
-
-        # Calculate idf for each token
-        for token in self.tokens:
-            self.idf[token] = log(self.doc_numbers / self.df[token])
+                    self.dic[token]['tf'] += entry.tokens[token]
+                    self.dic[token]['df'] += 1
 
         self.tokens.sort()
-
+        # Calculate idf and set the index for each token
         for index, token in enumerate(self.tokens):
-            self.token_index[token] = index
+            self.dic[token]['idf'] = self.doc_numbers / self.dic[token]['df']
+            self.dic[token]['index'] = index
 
 
 class Index(object):
@@ -90,7 +68,7 @@ class Index(object):
         self.tiered_index = []
 
     def construct_tiered_index(self):
-        calculate_weights(self.voc, self.entries)
+        # calculate_weights(self.voc, self.entries)
 
         for _ in config.THRESHOLD:
             self.tiered_index.append([])
@@ -99,28 +77,30 @@ class Index(object):
             for id2, token in enumerate(self.voc.tokens):
                 self.tiered_index[id1].append([])
                 for entry in entries:
-                    if token in entry.tokens and entry.tf[token] >= threshold:
-                        self.tiered_index[id1][id2].append(entry)
+                    if token in entry.tokens and entry.tokens[token] >= threshold:
+                        self.tiered_index[id1][id2].append(entry.docID)
 
+
+class Info(object):
+    def __init__(self, voc, entries, index):
+        self.voc_tokens = voc.tokens
+        self.voc_dic = voc.dic
+        self.entry_tokens = []
+        self.tiered_index = index.tiered_index
+
+        for entry in entries:
+            self.entry_tokens.append(entry.tokens)
 
 def preprocess(database):
     docs = os.listdir(database)
     entries = []
 
     for index, doc in enumerate(docs):
-        if config.DEBUG and index > 1000:
+        if config.DEBUG and index > 300:
             break
-        entries.append(Entry(database + os.sep + doc))
+        entries.append(Entry(index, database + os.sep + doc))
 
     return Voc(entries), entries
-
-
-def get_tiered_index():
-    pkl_file = open(config.TIERED_INDEX_FILE, 'r')
-
-    tiered_index = pickle.load(pkl_file)
-
-    return tiered_index
 
 
 def construct_tiered_index(voc, entries):
@@ -129,9 +109,10 @@ def construct_tiered_index(voc, entries):
 
     index = Index(voc, entries)
     index.construct_tiered_index()
+    info = Info(voc, entries, index)
 
     tiered_index_file = open(config.TIERED_INDEX_FILE, 'w')
-    pickle.dump(index, tiered_index_file, config.PICKLE_PROTOCOL)
+    pickle.dump(info, tiered_index_file, config.PICKLE_PROTOCOL)
     print 'Success to store the index into file {}'.format(config.TIERED_INDEX_FILE)
 
 

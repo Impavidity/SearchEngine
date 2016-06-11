@@ -72,3 +72,7 @@ target/
 
 #Pycharm
 .idea/*
+
+tiered_index.pkl
+
+config/tiered_index.pkl

@@ -14,10 +14,6 @@ config.WEIGHT_TYPE = 'wf-idf'
 
 config.PICKLE_PROTOCOL = 0
 
-config.ENTRIES_FILE = '..' + os.sep + 'config' + os.sep + 'entries.pkl'
-
-config.VOCABULLARY_FILE = '..' + os.sep + 'config' + os.sep + 'vocabullary.pkl'
-
 config.TIERED_INDEX_FILE = '..' + os.sep + 'config' + os.sep + 'tiered_index.pkl'
 
 config.PARA_TOP_K = 10

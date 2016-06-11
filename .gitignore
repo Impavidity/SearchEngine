@@ -1,7 +1,8 @@
 # Data files
 *.json
 *.npz
-*.html
+#*.html
+*.*~
 /Data Cleaning/tmp/*
 
 # Byte-compiled / optimized / DLL files

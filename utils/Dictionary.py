@@ -97,8 +97,8 @@ def preprocess(database):
 
     id_html = {}
     for index, doc in enumerate(docs):
-        if config.DEBUG and index > 300:
-            break
+        #if config.DEBUG and index > 300:
+        #    break
         id_html[index] = doc
         entries.append(Entry(index, database + os.sep + doc))
 

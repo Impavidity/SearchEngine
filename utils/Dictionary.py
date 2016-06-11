@@ -85,21 +85,26 @@ class Info(object):
     def __init__(self, voc, entries, index):
         self.voc_tokens = voc.tokens
         self.voc_dic = voc.dic
-        self.entry_tokens = []
+        self.entry_tokens = {}
         self.tiered_index = index.tiered_index
 
         for entry in entries:
-            self.entry_tokens.append(entry.tokens)
+            self.entry_tokens[entry.docID] = entry.tokens
 
 def preprocess(database):
     docs = os.listdir(database)
     entries = []
 
+    id_html = {}
     for index, doc in enumerate(docs):
         if config.DEBUG and index > 300:
             break
+        id_html[index] = doc
         entries.append(Entry(index, database + os.sep + doc))
 
+    if config.DEBUG:
+        id_html_file = open(config.ID_HTML_FILE, 'w')
+        pickle.dump(id_html, id_html_file, config.PICKLE_PROTOCOL)
     return Voc(entries), entries
 
 

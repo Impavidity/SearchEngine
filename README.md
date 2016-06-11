@@ -56,6 +56,16 @@ highest NO
 second AND
 third OR
 
+## Top k search and wildcard search
+
+Wildcard search is based on Top k search, wildcard search just finds all the possible query strings and then get all the results for these strings with top k search.
+
+These search methods are encapsulated in query.py, and it is very easy to use them, you can see the demo in utils/debug.py
+
+First, use pickle module to load the index file and the id-html map file.
+Then, just use topK_query(index, voc, entries, query, index_type='tiered') and wildcard_query(index, voc, entries, query, index_type='tiered') to get the corresponding result.
+
+
 ## Problems
 
 1. numpy version problem
@@ -63,4 +73,7 @@ third OR
 I must use the pre-installed numpy with version '1.8.0rc1' to make program run correctly.
 reference link: http://comments.gmane.org/gmane.comp.ai.gensim/5643
 Numpy 1.10 would stuck
+
+2. list_dir doesn't list file in a fixed way, so if we use integer to be document id, then we should build a map.
+I strongly suggest we should use document name as document id.
 

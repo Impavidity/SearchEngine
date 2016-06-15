@@ -1,5 +1,13 @@
 {% extends "layout.html" %}
-
+<
+{% block body %}
+  {%for item in canditates%}
+  <div class="container">
+    <a href={{url_for('getDoc',docID=item)}}><h6>{{ text[item][0].strip("Title:").strip() }}</h6></a>
+    <p> {{ text[item][1]}}</p>
+  </div>
+  {% endfor %}
+{% endblock %}
 
 {% block footpage %}
 <div class="container">
@@ -8,21 +16,11 @@
       <li class="previous">
         <a href="#">Previous</a>
       </li>
+      {%for i in range(npage)%}
       <li>
-        <a href="#">1</a>
+        <a href={{url_for('result',page=i+1)}}>{{i+1}}</a>
       </li>
-      <li>
-        <a href="#">2</a>
-      </li>
-      <li>
-        <a href="#">3</a>
-      </li>
-      <li>
-        <a href="#">4</a>
-      </li>
-      <li>
-        <a href="#">5</a>
-      </li>
+      {% endfor %}
       <li class="next">
         <a href="#">Next</a>
       </li>

@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block body %}
+
+<div class="container">
+  <h5 class="text-center"> {{ text[0].strip("Title:").strip() }}</h5>
+  <p>{{ text[2].strip("passage:").strip() }}</p>
+</div>
+
+
+{% endblock %}

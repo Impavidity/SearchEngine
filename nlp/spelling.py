@@ -66,7 +66,7 @@ class Spelling(object):
 
 
 if __name__=="__main__":
-    corrector = Spelling(["Dic/words","Big/words"])
+    corrector = Spelling(["../corpora/words_extend","../corpora/words_domain"])
     corrector.load()
     corrector.train()
     print corrector.correct("tape")

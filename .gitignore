@@ -73,8 +73,8 @@ target/
 
 #Pycharm
 .idea/*
+WebSite/.idea/*
 
-tiered_index.pkl
 
-config/tiered_index.pkl
-config/id_html.pkl
+Website/data/tiered_index.pkl
+Website/data/id_html.pkl

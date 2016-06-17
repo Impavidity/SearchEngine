@@ -1,7 +1,28 @@
-from engine import app
+import cPickle as pickle
+import os
 from flask import render_template, request, redirect, url_for
 
+from config.config import config
+from engine import app
+from engine.query import load_and_calc
+from engine.dic import parse, Info
+
 default_page_n = 10
+
+if not os.path.exists(config.TIERED_INDEX_FILE) or not os.path.exists(config.ID_HTML_FILE):
+    info, id_html = parse()
+    tiered_index_file = open(config.TIERED_INDEX_FILE, 'w')
+    pickle.dump(info, tiered_index_file, config.PICKLE_PROTOCOL)
+    id_html_file = open(config.ID_HTML_FILE, 'w')
+    pickle.dump(id_html, id_html_file, config.PICKLE_PROTOCOL)
+
+pkl_file = open(config.TIERED_INDEX_FILE, 'r')
+info = pickle.load(pkl_file)
+index, voc, entries = load_and_calc(info)
+
+pkl_file = open(config.ID_HTML_FILE, 'r')
+id_html = pickle.load(pkl_file)
+
 
 @app.route('/',methods=["POST","GET"])
 def index():

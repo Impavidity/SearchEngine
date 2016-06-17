@@ -14,9 +14,9 @@ config.WEIGHT_TYPE = 'wf-idf'
 
 config.PICKLE_PROTOCOL = 0
 
-config.ID_HTML_FILE = '..' + os.sep + 'config' + os.sep + 'id_html.pkl'
+config.ID_HTML_FILE = './data/id_html.pkl'
 
-config.TIERED_INDEX_FILE = '..' + os.sep + 'config' + os.sep + 'tiered_index.pkl'
+config.TIERED_INDEX_FILE = './data/tiered_index.pkl'
 
 config.PARA_TOP_K = 10
 

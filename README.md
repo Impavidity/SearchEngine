@@ -85,8 +85,7 @@ To let the title search more accurate, we add the title tokens to the doc tokens
 
 ## Problems
 
-1. numpy version problem
-
+1. numpy version problem  </br>
 I must use the pre-installed numpy with version '1.8.0rc1' to make program run correctly.
 reference link: http://comments.gmane.org/gmane.comp.ai.gensim/5643
 Numpy 1.10 would stuck
